@@ -1,5 +1,5 @@
 #!/bin/bash
-# Author: Lawkmu + ChatGPT Ubuntu Upgrade
+# Author: Lawkmu
 # 42login: mouait-e
 
 set -e
@@ -81,28 +81,34 @@ function basic_clean {
     clean_glob "$HOME"/.config/Code/User/workspaceStorage/*
 }
 
+# Function to check sudo availability
+function check_sudo {
+    if sudo -n true 2>/dev/null; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Full cleaning (system-wide)
 function full_cleaning {
-    echo -e "\033[35m\n -- Performing full system clean ... --\033[0m"
+    echo -e "\033[33m\n -- Attempting Full System Clean... --\033[0m"
 
-    # APT garbage
-    sudo apt-get clean -y
-    sudo apt-get autoclean -y
-    sudo apt-get autoremove -y
+    if ! check_sudo; then
+        echo -e "\033[31m\n⚠️  Full cleaning requires sudo permissions.\033[0m"
+        echo -e "\033[31mYou are running in a restricted environment (like 42 session).\nSkipping full system clean.\033[0m\n"
+        return 1
+    fi
 
-    # Systemd journal logs
-    sudo journalctl --vacuum-time=2d
+    # If sudo available, proceed with full clean
+    sudo apt clean -y &>/dev/null
+    sudo journalctl --vacuum-time=1d &>/dev/null
+    sudo rm -rf /var/tmp/* /tmp/* &>/dev/null
+    sudo rm -rf /var/log/*.gz /var/log/*.[0-9] &>/dev/null
 
-    # Old system logs
-    sudo rm -rf /var/log/*.gz /var/log/*.[0-9] /var/log/*.old 2>/dev/null || true
-    sudo rm -rf /var/cache/apt/archives/* 2>/dev/null || true
-
-    # Temp files
-    sudo rm -rf /tmp/* /var/tmp/* 2>/dev/null || true
-
-    # User cache again to be sure
-    clean_glob "$HOME"/.cache/*
+    echo -e "\033[32m\n✅ Full System Clean completed!\033[0m"
 }
+
 
 # Docker cleaning
 function docker_cleaning {
@@ -132,5 +138,5 @@ print_storage "Available After Cleaning"
 echo -e "\n\033[33m -- Cleaning complete! Enjoy a fresh Ubuntu session! --\033[0m"
 
 echo -e	"\nReport issues:"
-echo -e "  GitHub  ~> \033[4;1;34lawkmu\033[0m"
+echo -e "  GitHub  ~> \033[4;1;34mlawkmu\033[0m"
 
