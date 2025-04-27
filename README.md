@@ -28,7 +28,7 @@ Keep your system fresh, light, and ready to hack!
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Ubuntu_Session_Cleaner.git
+git clone https://github.com/LawKmu/ubuntu-42-session-cleaner.git
 cd Ubuntu_Session_Cleaner
 chmod +x Ubuntu_Cleaner_42.sh
 ```
